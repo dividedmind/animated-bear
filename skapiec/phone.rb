@@ -1,8 +1,25 @@
 class Phone < OpenStruct
+  include Memoist
+  include Methadone::CLILogging
+  
   def initialize name, price
     super()
     self.name = name
     self.price = price
+  end
+  
+  def score
+    super || (self.score = calculate_score)
+  end
+  
+  def calculate_score
+    score = {}
+    self.each_pair do |k, v|
+      case k
+      when :name, :price
+      end
+    end
+    score.values.inject(rand, :+)
   end
   
   def cpu= value
@@ -63,7 +80,7 @@ class Phone < OpenStruct
           core += " A-#{$1}" if description =~ /A[ -]?(\d+)/
           specs.merge! core: core
         else
-          warn "unrecognized processor: #{description}"
+          # warn "unrecognized processor: #{description}"
           specs.merge! description: description
         end
       end

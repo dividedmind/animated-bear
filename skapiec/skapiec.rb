@@ -98,7 +98,7 @@ module Skapiec
           phone.os = [:blackberry, $1]
         when "producenta", "PROPRIET/REX", "S-Class 3D"
           phone.os = [:proprietary]
-        when "Nokia OS"
+        when /Nokia/, "Series 30"
           phone.os = [:nokia]
         when /Bada(?:\s+(\d\S+))?/
           phone.os = [:bada, $1]
