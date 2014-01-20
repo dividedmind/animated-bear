@@ -12,6 +12,10 @@ class Phone < OpenStruct
     super || (self.score = calculate_score)
   end
   
+  def bfb
+    super || (self.bfb = score / price)
+  end
+  
   def calculate_score
     score = {}
     self.each_pair do |k, v|
