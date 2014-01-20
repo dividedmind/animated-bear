@@ -73,13 +73,7 @@ end
 allegro = Addressable::Template.new 'http://allegro.pl/telefony-komorkowe-165?string={query}&buyNew=1&order=qd&offerTypeBuyNow=1'
 
 totalphones.each do |name, _|
-  printf "Looking up price for #{name}..."
-  if phoneprices[name]
-    puts " found #{phoneprices[name]}"
-    next
-  end
-  
-  puts " going to allegro..."
+  next if phoneprices[name]
   browser.goto allegro.expand(query: name).to_s
   readline
   price = browser.element(css: '.price .dist').text.gsub(' ', '').scan(/\d+/).first.to_i
