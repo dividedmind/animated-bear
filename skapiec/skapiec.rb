@@ -81,6 +81,12 @@ module Skapiec
         ct = ct.to_i
         ct *= 1024 if unit == 'GB'
         phone.memory = ct
+      when 'Pojemność akumulatora'
+        phone.battery_mAh = value.to_i
+      when 'Czas czuwania'
+        phone.battery_standby_days = value.to_fl
+      when 'Czas rozmowy'
+        phone.battery_talk_hours = value.to_fl
       else
         warn "Unknown tag #{tag}, collecting values..." unless collecting?
         collect_tag tag, value
@@ -97,6 +103,7 @@ module Skapiec
     end
     
     def dump_collected_values
+      return unless collecting?
       info "Values of unknown tag #{@collected_tag}:"
       info @collected_values.sort.uniq.pretty_print_inspect
     end
