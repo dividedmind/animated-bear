@@ -59,8 +59,17 @@ module Skapiec
         phone.screen_size = diam.to_fl if diam
         phone.screen_resolution = [w.to_i, h.to_i] if w
       when 'Kolory'
-        if value =~ /16 mln/
+        case value
+        when /16(,\d)? mln/
           phone.color_bits = 24
+        when /6[45] tys/
+          phone.color_bits = 16
+        when /256 tys/, /262 tys/, /160 tys/, /156 tys/
+          phone.color_bits = 18
+        when /mono/, '2'
+          phone.color_bits = 1
+        when /4 tys/
+          phone.color_bits = 12
         else
           fatal "unknown colors: #{value}"
         end
@@ -78,12 +87,32 @@ module Skapiec
       when 'Komunikacja', 'Karta pamięci', 'Funkcje głosowe', 'Rodzaj'
         # too unreliable or irrelevant
       when 'System operacyjny'
-        if value =~ /Android (\d\S+)/
+        case value
+        when /Android(?:\s+(\d\S+))?/
           phone.os = [:android, $1]
-        elsif value =~ /Windows.*(\d+)/
+        when /Windows(?:\s+(\d\S+))?/
           phone.os = [:windows, $1]
+        when /i(?:Phone )?OS(?:\s+(\d\S+))?/
+          phone.os = [:ios, $1]
+        when /BlackBerry(?: OS)?(?:\s*(\d+))?/
+          phone.os = [:blackberry, $1]
+        when "producenta", "PROPRIET/REX", "S-Class 3D"
+          phone.os = [:proprietary]
+        when "Nokia OS"
+          phone.os = [:nokia]
+        when /Bada(?:\s+(\d\S+))?/
+          phone.os = [:bada, $1]
+        when /Symbian(?:\s+(\d\S+))?/
+          phone.os = [:symbian, $1]
+        when "ST-E RTKE"
+          phone.os = value
+        when /Maemo(?:\s+(\d\S+))?/
+          phone.os = [:maemo, $1]
+        when /MeeGo(?:\s+(\d\S+))?/
+          phone.os = [:maemo, $1]
         else
           fatal "Unrecognized OS: #{value}"
+          phone.os = value
         end
       when 'Procesor'
         phone.cpu = value
