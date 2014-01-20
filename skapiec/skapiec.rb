@@ -14,11 +14,17 @@ module Skapiec
     FILE = '200-telefony-gsm.html'
     
     def page_text
-      File.read FILE
+      if File.exists? FILE
+        File.read FILE
+      else
+        text = Fetcher.fetch
+        File.write FILE, text
+        text
+      end
     end
     
     def html
-      Nokogiri::HTML page_text, nil, 'latin2'
+      Nokogiri::HTML page_text
     end
     
     def phones
@@ -106,6 +112,42 @@ module Skapiec
       return unless collecting?
       info "Values of unknown tag #{@collected_tag}:"
       info @collected_values.sort.uniq.pretty_print_inspect
+    end
+  end
+  
+  module Fetcher
+    class << self
+      include Methadone::CLILogging
+      URL = 'http://www.skapiec.pl/cat/200-telefony-gsm.html'
+      
+      def fetch
+        require 'watir-webdriver'
+        text = ""
+        
+        b = Watir::Browser.new
+        b.goto URL
+        
+        throttle
+        
+        b.div(class: 'pageLimitSelector').as.last.click
+        
+        while true
+          text += b.html
+          next_page = b.a(class: 'next')
+          break unless next_page.exists?
+          throttle
+          next_page.click
+        end
+        
+        text
+      end
+      
+      THROTTLE = 10
+      def throttle
+        time = rand THROTTLE
+        info "Sleeping for #{time}"
+        sleep time
+      end
     end
   end
 end
