@@ -4,4 +4,4 @@ require 'pp'
 
 require './skapiec'
 
-pp Skapiec.phones
+Skapiec.phones
