@@ -74,6 +74,8 @@ module Skapiec
         else
           fatal "Unrecognized OS: #{value}"
         end
+      when 'Procesor'
+        phone.cpu = value
       else
         warn "Unknown tag #{tag}, collecting values..." unless collecting?
         collect_tag tag, value
