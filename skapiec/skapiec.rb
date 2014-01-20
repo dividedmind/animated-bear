@@ -76,6 +76,11 @@ module Skapiec
         end
       when 'Procesor'
         phone.cpu = value
+      when 'Pamięć RAM'
+        ct, unit = value.split
+        ct = ct.to_i
+        ct *= 1024 if unit == 'GB'
+        phone.memory = ct
       else
         warn "Unknown tag #{tag}, collecting values..." unless collecting?
         collect_tag tag, value
