@@ -55,9 +55,9 @@ module Skapiec
       when 'Aparat cyfrowy'
         phone.camera_resolution = value.to_fl
       when 'Ekran'
-        _, diam, w, h = value.match(/^(.*)" (\d+)x(\d+)$/).to_a
-        phone.screen_size = diam.to_fl
-        phone.screen_resolution = [w.to_i, h.to_i]
+        _, diam, w, h = value.match(/^(.*")?\s*(?:(\d+)x(\d+))?$/).to_a
+        phone.screen_size = diam.to_fl if diam
+        phone.screen_resolution = [w.to_i, h.to_i] if w
       when 'Kolory'
         if value =~ /16 mln/
           phone.color_bits = 24
@@ -65,7 +65,12 @@ module Skapiec
           fatal "unknown colors: #{value}"
         end
       when 'Wymiary'
-        phone.size = value.scan(/\d+/).map(&:to_i)
+        size = value.scan(/^([0-9,.]+)\s*x\s*([0-9,.]+)\s*x\s*([0-9,.]+)(?: mm)?/i).first.map(&:to_fl)
+        if size.any? {|x| x < 4 }
+          # probably centimeters
+          size.map! { |x| x * 10 }
+        end
+        phone.size = size
       when 'Waga'
         phone.weight = value.to_i
       when 'Wbudowana pamięć'
@@ -97,6 +102,9 @@ module Skapiec
         warn "Unknown tag #{tag}, collecting values..." unless collecting?
         collect_tag tag, value
       end
+    rescue
+      fatal "Error #{$!} interpreting tag #{tag}: '#{value}'"
+      exit
     end
     
     def collecting?
