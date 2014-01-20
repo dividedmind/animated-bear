@@ -2,6 +2,9 @@
 
 require 'pdf-reader'
 require 'pp'
+require 'watir-webdriver'
+require 'addressable/template'
+require 'json'
 
 file = 'D_006_0006806.pdf'
 reader = PDF::Reader.new file
@@ -59,4 +62,28 @@ end
 pp totalphones
 totalphones.each do |name, prices|
   puts name unless prices.rsorted?
+end
+
+phoneprices = JSON.load(File.read('prices.json')) rescue {}
+
+def browser
+  @browser ||= Watir::Browser.new
+end
+
+allegro = Addressable::Template.new 'http://allegro.pl/telefony-komorkowe-165?string={query}&buyNew=1&order=qd&offerTypeBuyNow=1'
+
+totalphones.each do |name, _|
+  printf "Looking up price for #{name}..."
+  if phoneprices[name]
+    puts " found #{phoneprices[name]}"
+    next
+  end
+  
+  puts " going to allegro..."
+  browser.goto allegro.expand(query: name).to_s
+  readline
+  price = browser.element(css: '.price .dist').text.gsub(' ', '').scan(/\d+/).first.to_i
+  puts "Got price: #{price}"
+  phoneprices[name] = price
+  File.write 'prices.json', JSON.dump(phoneprices)
 end
