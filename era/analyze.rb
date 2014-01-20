@@ -27,8 +27,36 @@ def parse lines
     name.gsub! /(((?<=\p{Ll})(\p{Lu}|\d))|\()/, ' \1'
     
     prices.unshift 1 if prices.size == 6
-    [name] + prices.map(&:to_i)
+    [name, prices.map(&:to_i)]
   end
 end
 
-pp parse(phonelines)
+phones = parse(phonelines)
+
+monthly24 = [260, 200, 170, 130, 90, 70, 50]
+
+total24extra = monthly24.map {|x| x * 24 - 40 * 24 }
+total36extra = monthly24.map {|x| (x-10) * 36 - 40 * 36 }
+
+pp [total24extra, total36extra]
+
+totalextra = (total24extra.zip total36extra).map(&:min)
+p totalextra
+
+class Array
+  def sum
+    inject(:+)
+  end
+  def rsorted?
+    self == sort.reverse
+  end
+end
+
+totalphones = phones.map do |name, prices|
+  [name, prices.zip(totalextra).map(&:sum)]
+end
+
+pp totalphones
+totalphones.each do |name, prices|
+  puts name unless prices.rsorted?
+end
