@@ -58,6 +58,12 @@ module Skapiec
         else
           fatal "unknown colors: #{value}"
         end
+      when 'Komunikacja'
+        # too unreliable
+      when 'Funkcje głosowe'
+        # irrelevant
+      when 'Wymiary'
+        phone.size = value.scan(/\d+/).map(&:to_i)
       else
         warn "Unknown tag #{tag}, collecting values..." unless collecting?
         collect_tag tag, value
