@@ -8,7 +8,7 @@ module Prices
       @browser ||= Watir::Browser.new
     end
     
-    ALLEGRO = Addressable::Template.new 'http://allegro.pl/telefony-komorkowe-165?string={query}&buyNew=1&order=qd&offerTypeBuyNow=1'
+    ALLEGRO = Addressable::Template.new 'http://allegro.pl/telefony-komorkowe-165?string={query}&buyNew=1&order=d&offerTypeBuyNow=1'
 
     def phoneprices
       @phoneprices ||= JSON.load(File.read('prices.json')) rescue {}
