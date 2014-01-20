@@ -4,4 +4,6 @@ require 'pp'
 
 require './skapiec'
 
-Skapiec.phones
+pp Skapiec.phones
+
+Skapiec.dump_collected_values

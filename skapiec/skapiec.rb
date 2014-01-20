@@ -3,6 +3,7 @@ require 'nokogiri'
 require 'ostruct'
 require 'methadone'
 
+require './monkey'
 require './phone'
 
 module Skapiec
@@ -38,15 +39,25 @@ module Skapiec
         phone
       end
       
-      dump_collected_values
-      
       phones
     end
     
     def interpret_tag phone, tag, value
       case tag
-      when 'foo'
-        
+      when 'Sieć'
+        phone.frequencies = value.scan(/\d+/).map(&:to_i)
+      when 'Aparat cyfrowy'
+        phone.camera_resolution = value.to_fl
+      when 'Ekran'
+        _, diam, w, h = value.match(/^(.*)" (\d+)x(\d+)$/).to_a
+        phone.screen_size = diam.to_fl
+        phone.resolution = [w.to_i, h.to_i]
+      when 'Kolory'
+        if value =~ /16 mln/
+          phone.color_bits = 24
+        else
+          fatal "unknown colors: #{value}"
+        end
       else
         warn "Unknown tag #{tag}, collecting values..." unless collecting?
         collect_tag tag, value
