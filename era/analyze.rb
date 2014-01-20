@@ -6,6 +6,8 @@ require 'watir-webdriver'
 require 'addressable/template'
 require 'json'
 
+BEST_OFFER = 30 # play unlimited smartfon
+
 file = 'D_006_0006806.pdf'
 reader = PDF::Reader.new file
 
@@ -38,8 +40,8 @@ phones = parse(phonelines)
 
 monthly24 = [260, 200, 170, 130, 90, 70, 50]
 
-total24extra = monthly24.map {|x| x * 24 - 40 * 24 }
-total36extra = monthly24.map {|x| (x-10) * 36 - 40 * 36 }
+total24extra = monthly24.map {|x| x * 24 - BEST_OFFER * 24 }
+total36extra = monthly24.map {|x| (x-10) * 36 - BEST_OFFER * 36 }
 
 pp [total24extra, total36extra]
 
@@ -63,7 +65,6 @@ pp totalphones
 totalphones.each do |name, prices|
   puts name unless prices.rsorted?
 end
-
 
 def getprice name
   phoneprices ||= JSON.load(File.read('prices.json')) rescue {}
@@ -92,7 +93,7 @@ end
 
 pp deltas.sort
 
-total36textra = monthly24.map {|x| (x+5) * 36 - 40 * 36 }
+total36textra = monthly24.map {|x| (x+5) * 36 - BEST_OFFER * 36 }
 
 totaltablets = parse(tablety).map do |name, prices|
   [name, prices.zip(total36textra).map(&:sum)]
