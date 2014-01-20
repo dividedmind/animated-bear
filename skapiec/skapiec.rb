@@ -51,19 +51,29 @@ module Skapiec
       when 'Ekran'
         _, diam, w, h = value.match(/^(.*)" (\d+)x(\d+)$/).to_a
         phone.screen_size = diam.to_fl
-        phone.resolution = [w.to_i, h.to_i]
+        phone.screen_resolution = [w.to_i, h.to_i]
       when 'Kolory'
         if value =~ /16 mln/
           phone.color_bits = 24
         else
           fatal "unknown colors: #{value}"
         end
-      when 'Komunikacja'
-        # too unreliable
-      when 'Funkcje głosowe'
-        # irrelevant
       when 'Wymiary'
         phone.size = value.scan(/\d+/).map(&:to_i)
+      when 'Waga'
+        phone.weight = value.to_i
+      when 'Wbudowana pamięć'
+        phone.memory = value.to_i
+      when 'Komunikacja', 'Karta pamięci', 'Funkcje głosowe', 'Rodzaj'
+        # too unreliable or irrelevant
+      when 'System operacyjny'
+        if value =~ /Android (\d\S+)/
+          phone.os = [:android, $1]
+        elsif value =~ /Windows.*(\d+)/
+          phone.os = [:windows, $1]
+        else
+          fatal "Unrecognized OS: #{value}"
+        end
       else
         warn "Unknown tag #{tag}, collecting values..." unless collecting?
         collect_tag tag, value
