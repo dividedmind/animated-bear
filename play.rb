@@ -3,7 +3,7 @@ require './monkey'
 require './prices'
 
 module Play
-  FILE = 'cennik-play.pdf'
+  FILE = 'cennik-play-sklep.pdf'
   
   class << self
     def deltas best_offer

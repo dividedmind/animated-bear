@@ -22,7 +22,7 @@ module Prices
         price = browser.element(css: '.price .dist').text.gsub(' ', '').scan(/\d+/).first.to_i
         puts "Got price: #{price}"
         phoneprices[name] = price
-        File.write 'prices.json', JSON.dump(phoneprices)
+        File.write 'prices.json', JSON.pretty_generate(phoneprices)
       end
       price
     end

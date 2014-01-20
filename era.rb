@@ -23,12 +23,16 @@ module Era
 
       total24extra = monthly24.map {|x| x * 24 - best_offer * 24 }
       total36extra = monthly24.map {|x| (x-10) * 36 - best_offer * 36 }
+      
+      p [total24extra, total36extra]
 
-      totalextra = (total24extra.zip total36extra).map(&:min)
+      totalextra = total24extra
 
       totalphones = phones.map do |name, prices|
         [name, prices.zip(totalextra).map(&:sum)]
       end
+      
+      pp totalphones
 
       deltas = totalphones.map do |name, prices|
         [Prices.get(name) - prices.min, name]
@@ -47,7 +51,7 @@ module Era
     
     def parse lines
       entries = lines.scan(/^\s*((\S+\s+){6,7}\S+)\s*$/).map(&:first)
-      entries.map! {|l| l.gsub %r{\d+/(\d+)\*}, '\1' }
+      entries.map! {|l| l.gsub %r{(\d+)/\d+\*}, '\1' }
       entries.select! {|l| l =~ /^\S+\s+(\d+\s+){5,6}\d+/ }
 
       phones = entries.map do |line|
