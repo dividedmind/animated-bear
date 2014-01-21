@@ -136,9 +136,13 @@ module Skapiec
       when 'Pojemność akumulatora'
         phone.battery_mAh = value.to_i
       when 'Czas czuwania'
-        phone.battery_standby_days = value.to_fl
+        v = value.to_fl
+        v /= 24 if v > 60
+        phone.battery_standby_days = v
       when 'Czas rozmowy'
-        phone.battery_talk_hours = value.to_fl
+        v = value.to_fl
+        v /= 60 if v > 150
+        phone.battery_talk_hours = v
       else
         warn "Unknown tag #{tag}, collecting values..." unless collecting?
         collect_tag tag, value

@@ -56,8 +56,13 @@ module Scorer
     end
     
     def battery_standby_days v
-      v /= 24 if v > 60
       Math.sqrt(v) * 2 - 9
+    rescue 
+      nil
+    end
+    
+    def battery_talk_hours v
+      Math.sqrt(Math.log2(v)) * 6 - 10
     rescue 
       nil
     end

@@ -4,5 +4,15 @@
   },
   "Evolveo EP-500": {
     "size": [52, 111, 14]
+  },
+  "Pentagram Monster P430-1": {
+    "battery_talk_hours": 100
+  },
+  "Evolveo Gladiator RG200": {
+    "battery_talk_hours": 4.5
+  },
+  "Evolveo Gladiator RG300": {
+    "battery_talk_hours": 4.5
   }
+
 }
