@@ -38,6 +38,12 @@ module Scorer
       end
     end
     
+    def weight v
+      - Math.log2(Math.sqrt(v)) * 9 + 31
+    rescue
+      nil
+    end
+    
     def color_bits cb
       cb / 2 - 6
     rescue

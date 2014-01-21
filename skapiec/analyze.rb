@@ -32,10 +32,10 @@ end
 
 draw_hist *scores.histogram
 draw_hist *phones.map {|p| 
-  p.scores[:memory]
+  p.scores[:weight]
 }.compact.histogram
 
-phones = phones.sort_by{|p|p.scores[:memory]||-1}
-pp phones[0]
+phones = phones.sort_by{|p|p.scores[:weight]||-1}
+pp phones[-1]
 
 Skapiec.dump_collected_values
