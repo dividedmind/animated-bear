@@ -32,10 +32,10 @@ end
 
 draw_hist *scores.histogram
 draw_hist *phones.map {|p| 
-  p.scores[:size]
+  p.scores[:battery_standby_days]
 }.compact.histogram
 
-phones = phones.sort_by{|p|p.scores[:size]|| -1000}
+phones = phones.sort_by{|p|p.scores[:battery_standby_days]|| 0}
 pp phones[-1]
 
 Skapiec.dump_collected_values

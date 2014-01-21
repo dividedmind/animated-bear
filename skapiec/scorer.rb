@@ -55,6 +55,13 @@ module Scorer
       nil
     end
     
+    def battery_standby_days v
+      v /= 24 if v > 60
+      Math.sqrt(v) * 2 - 9
+    rescue 
+      nil
+    end
+    
     def os os
       kind, ver = os
       case kind
