@@ -95,7 +95,10 @@ module Skapiec
       when 'Waga'
         phone.weight = value.to_i
       when 'Wbudowana pamięć'
-        phone.memory = value.to_i
+        ct, unit = value.split
+        ct = ct.to_i
+        ct *= 1024 if unit == 'GB'
+        phone.memory = ct
       when 'Komunikacja', 'Karta pamięci', 'Funkcje głosowe', 'Rodzaj'
         # too unreliable or irrelevant
       when 'System operacyjny'
@@ -132,7 +135,7 @@ module Skapiec
         ct, unit = value.split
         ct = ct.to_i
         ct *= 1024 if unit == 'GB'
-        phone.memory = ct
+        phone.ram = ct
       when 'Pojemność akumulatora'
         phone.battery_mAh = value.to_i
       when 'Czas czuwania'

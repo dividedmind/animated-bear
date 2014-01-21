@@ -25,8 +25,9 @@ module Scorer
     end
     
     def memory mem
-      return nil unless mem && mem > 0
-      Math.log2(mem) - 6.5
+      Math.log2(mem) / 1.5 - 5 if mem > 0
+    rescue
+      nil
     end
 
     def camera_resolution cr
