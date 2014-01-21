@@ -5,10 +5,13 @@ require 'histogram/array'
 require 'ascii_charts'
 
 require './skapiec'
+require './scorer'
+
+Phone.scorer = Scorer
 
 phones = Skapiec.phones
 
-def normalize phones, floor: 0, ceil: 10
+def normalize phones, floor: 0, ceil: 100
   scores = phones.map(&:score)
   min, max = scores.minmax
   delta = max - min
@@ -18,14 +21,18 @@ def normalize phones, floor: 0, ceil: 10
   end
 end
 
-normalize phones
+#normalize phones
 scores = phones.map(&:score)
 
-bins, freqs = scores.histogram(10)
-puts AsciiCharts::Cartesian.new(
-  bins.map{|x|x.round(2)}.zip(freqs), bar: true, hide_zero: true, max_y_vals: 10
-).draw
+def draw_hist bins, freqs
+  puts AsciiCharts::Cartesian.new(
+    bins.map{|x|x.round(2)}.zip(freqs), bar: true, hide_zero: true, max_y_vals: 10
+  ).draw
+end
 
-pp phones.sort_by(&:bfb)[-3..-1]
+draw_hist *scores.histogram
+draw_hist *phones.map(&:ppi).compact.histogram(10)
+
+pp phones.sort_by{|p|p.ppi || 0}[-3..-1]
 
 Skapiec.dump_collected_values

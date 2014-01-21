@@ -1,6 +1,10 @@
 class Phone < OpenStruct
   include Memoist
   include Methadone::CLILogging
+
+  class << self
+    attr_accessor :scorer
+  end
   
   def initialize name, price
     super()
@@ -16,14 +20,23 @@ class Phone < OpenStruct
     super || (self.bfb = score / price)
   end
   
+  def ppi
+    super || self.ppi = calculate_ppi
+  end
+  
+  def calculate_ppi
+    Math.sqrt(screen_resolution.map{|x|x*x}.inject(:+))/screen_size
+  rescue
+    nil
+  end
+  
+  def scorer
+    Phone.scorer
+  end
+  
   def calculate_score
-    score = {}
-    self.each_pair do |k, v|
-      case k
-      when :name, :price
-      end
-    end
-    score.values.inject(rand, :+)
+    score = rand
+    score += scorer.score self if scorer
   end
   
   def cpu= value

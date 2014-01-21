@@ -3,3 +3,9 @@ class String
     sub(',','.').to_f
   end
 end
+
+class Array
+  def mean
+    inject(:+) / length
+  end
+end
