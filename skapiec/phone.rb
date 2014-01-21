@@ -24,6 +24,10 @@ class Phone < OpenStruct
     super || self.ppi = calculate_ppi
   end
   
+  def pretty_print *a
+    to_h.pretty_print *a
+  end
+  
   def calculate_ppi
     Math.sqrt(screen_resolution.map{|x|x*x}.inject(:+))/screen_size
   rescue
