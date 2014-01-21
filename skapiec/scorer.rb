@@ -37,6 +37,12 @@ module Scorer
       end
     end
     
+    def color_bits cb
+      cb / 2 - 6
+    rescue
+      nil
+    end
+    
     def os os
       kind, ver = os
       case kind
