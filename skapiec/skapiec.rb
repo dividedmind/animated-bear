@@ -2,6 +2,7 @@ require 'memoist'
 require 'nokogiri'
 require 'ostruct'
 require 'methadone'
+require 'json'
 
 require './monkey'
 require './phone'
@@ -27,6 +28,13 @@ module Skapiec
       Nokogiri::HTML page_text
     end
     
+    SPECS_FILE = 'specs.json'
+    
+    def override phone
+      @overrides ||= (JSON.load File.read(SPECS_FILE) rescue {})
+      @overrides[phone] || {}
+    end
+    
     def phones
       phones = html.css('.complex').map do |entry|
         name = entry.css('.entry-title a').text.strip
@@ -40,6 +48,10 @@ module Skapiec
           next if tag.empty?
           interpret_tag phone, tag, value
           [tag, value]
+        end
+        
+        override(name).each do |k, v|
+          phone[k.to_sym] = v
         end
         
         phone

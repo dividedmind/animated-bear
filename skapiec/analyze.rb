@@ -31,8 +31,9 @@ def draw_hist bins, freqs
 end
 
 draw_hist *scores.histogram
-draw_hist *phones.map(&:ppi).compact.histogram(10)
+#draw_hist *phones.map(&:ppi).compact.histogram(10)
 
-pp phones.sort_by{|p|p.ppi || 0}[-3..-1]
+phones = phones.sort_by{|p|p.score || 100}
+pp phones[-3..-1]
 
 Skapiec.dump_collected_values

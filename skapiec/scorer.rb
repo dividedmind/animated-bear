@@ -17,7 +17,7 @@ module Scorer
     end
     
     def ppi ppi
-      (ppi || 0) / 100 - 5
+      (ppi || 0) / 50 - 5
     end
     
     def os os
