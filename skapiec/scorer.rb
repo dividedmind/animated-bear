@@ -7,13 +7,22 @@ module Scorer
         next unless sl && sl.first == __FILE__
         [t, send(t, phone.send(t))]
       end.compact.to_h
-      
+
+      leftover_keys = phone.to_h.keys - scores.keys - 
+          %i(name price frequencies)
+      # warn "Left over keys: #{leftover_keys}" if leftover_keys
       phone.scores = scores
       scores.values.compact.inject 0, :+
     end
       
     def screen_size size
       size * 2 - 7.28
+    rescue
+      nil
+    end
+    
+    def ram v
+      Math.log2(v) ** 2 / 10 - 7
     rescue
       nil
     end
