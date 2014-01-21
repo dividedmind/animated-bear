@@ -43,6 +43,12 @@ module Scorer
       nil
     end
     
+    def screen_resolution sr
+      Math.log2(Math.sqrt(sr.inject(:*))) * 2.5 - 21
+    rescue
+      nil
+    end
+    
     def os os
       kind, ver = os
       case kind
