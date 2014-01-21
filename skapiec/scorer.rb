@@ -49,6 +49,12 @@ module Scorer
       nil
     end
     
+    def size sz
+      5000/Math.log2(sz.inject(:*))**2 - 19
+    rescue
+      nil
+    end
+    
     def os os
       kind, ver = os
       case kind

@@ -1,5 +1,8 @@
 {
   "Samsung S6802 Ace duos": {
     "screen_resolution": [320, 480]
+  },
+  "Evolveo EP-500": {
+    "size": [52, 111, 14]
   }
 }
