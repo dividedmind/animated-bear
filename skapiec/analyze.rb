@@ -30,12 +30,16 @@ def draw_hist bins, freqs
   ).draw
 end
 
-draw_hist *scores.histogram
-draw_hist *phones.map {|p| 
-  p.bfb
-}.compact.histogram
-
-phones = phones.sort_by &:bfb #{|p|p.scores[:ram]||-1}
-pp phones[-3..-1]
+def stats vals
+  draw_hist *vals.compact.histogram(10)
+  p vals.compact.mean_sd
+end
 
 Skapiec.dump_collected_values
+# stats phones.map { |x| x.ssd }
+
+#pp phones.map(&:os).uniq
+
+phones = phones.sort_by &:bfb #{|p|p.scores[:ram]||-1}
+pp phones[-1]
+

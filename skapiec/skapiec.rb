@@ -106,7 +106,7 @@ module Skapiec
       when 'Dysk HDD'
         phone.hdd = value.to_i
       when 'Dysk SSHD'
-        _, hdd, ssd = value.match(/(\d+)GB HDD \+ (\d+)GB SSD/)
+        _, hdd, ssd = value.match(/(\d+)GB HDD \+ (\d+)GB SSD/).to_a
         phone.hdd = hdd.to_i
         phone.ssd = ssd.to_i
       when 'Modem 3G'
