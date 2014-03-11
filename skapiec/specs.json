@@ -13,6 +13,14 @@
   },
   "Evolveo Gladiator RG300": {
     "battery_talk_hours": 4.5
+  },
+  "HTC ONE": {
+    "price": 1969
+  },
+  "Pentagram Monster P430-1": {
+    "price": 599
+  },
+  "Prestigio MultiPhone 3400 DUO": {
+    "price": 340
   }
-
 }
