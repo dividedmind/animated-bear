@@ -12,7 +12,7 @@ module Skapiec
     extend Memoist
     include Methadone::CLILogging
     
-    FILE = '200-telefony-gsm.html'
+    FILE = '17-notebooki.html'
     
     def page_text
       if File.exists? FILE
@@ -62,90 +62,69 @@ module Skapiec
     
     def interpret_tag phone, tag, value
       case tag
-      when 'Sieć'
-        phone.frequencies = value.scan(/\d+/).map(&:to_i)
-      when 'Aparat cyfrowy'
-        phone.camera_resolution = value.to_fl
+      when 'Matryca'
+        phone.matte = !!(value =~ /mat/i)
       when 'Ekran'
-        _, diam, w, h = value.match(/^(.*")?\s*(?:(\d+)x(\d+))?$/).to_a
+        _, diam, w, h, ts = value.match(/^(.*")?\s*(?:(\d+)x(\d+))?\s*(?i:touchscreen)?$/).to_a
         phone.screen_size = diam.to_fl if diam
         phone.screen_resolution = [w.to_i, h.to_i] if w
-      when 'Kolory'
-        case value
-        when /16(,\d)? mln/
-          phone.color_bits = 24
-        when /6[45] tys/
-          phone.color_bits = 16
-        when /256 tys/, /262 tys/, /160 tys/, /156 tys/
-          phone.color_bits = 18
-        when /mono/, '2'
-          phone.color_bits = 1
-        when /4 tys/
-          phone.color_bits = 12
-        else
-          fatal "unknown colors: #{value}"
-        end
-      when 'Wymiary'
-        size = value.scan(/^([0-9,.]+)\s*x\s*([0-9,.]+)\s*x\s*([0-9,.]+)(?: mm)?/i).first.map(&:to_fl)
-        if size.any? {|x| x < 4 }
-          # probably centimeters
-          size.map! { |x| x * 10 }
-        end
-        phone.size = size
-      when 'Waga'
-        phone.weight = value.to_i
-      when 'Wbudowana pamięć'
-        ct, unit = value.split
-        ct = ct.to_i
-        ct *= 1024 if unit == 'GB'
-        phone.memory = ct
-      when 'Komunikacja', 'Karta pamięci', 'Funkcje głosowe', 'Rodzaj'
-        # too unreliable or irrelevant
+        phone.touchscreen = !!ts
       when 'System operacyjny'
         case value
+        when /Brak/
+          phone.os = false
         when /Android(?:\s+(\d\S+))?/
           phone.os = [:android, $1]
-        when /Windows(?:\s+(\d\S+))?/
+        when /Chrome OS/
+          phone.os = [:chrome]
+        when /Linux/
+          phone.os = [:linux]
+        when /Mac OS X/
+          phone.os = [:darwin]
+        when /Vista/
+          phone.os = [:windows, value]
+        when /Windows (.*)/
           phone.os = [:windows, $1]
-        when /i(?:Phone )?OS(?:\s+(\d\S+))?/
-          phone.os = [:ios, $1]
-        when /BlackBerry(?: OS)?(?:\s*(\d+))?/
-          phone.os = [:blackberry, $1]
-        when "producenta", "PROPRIET/REX", "S-Class 3D"
-          phone.os = [:proprietary]
-        when /Nokia/, "Series 30"
-          phone.os = [:nokia]
-        when /Bada(?:\s+(\d\S+))?/
-          phone.os = [:bada, $1]
-        when /Symbian(?:\s+(\d\S+))?/
-          phone.os = [:symbian, $1]
-        when "ST-E RTKE"
-          phone.os = value
-        when /Maemo(?:\s+(\d\S+))?/
-          phone.os = [:maemo, $1]
-        when /MeeGo(?:\s+(\d\S+))?/
-          phone.os = [:maemo, $1]
         else
           fatal "Unrecognized OS: #{value}"
           phone.os = value
         end
+      when 'Sieć bezprzewodowa WLAN'
+        phone.wifi = (value == 'Tak' ? true : value)
+      when 'Bluetooth'
+        phone.bluetooth = (value == 'Tak')
+      when 'HDMI'
+        phone.hdmi = (value == 'tak')
+      when 'Waga'
+        phone.weight = value.tr(?,,?.).to_f
+      when 'Nr producenta'
+        phone.model_number = value
       when 'Procesor'
         phone.cpu = value
+      when 'Dysk SSD'
+        phone.ssd = value.to_i
+      when 'Dysk HDD'
+        phone.hdd = value.to_i
+      when 'Dysk SSHD'
+        _, hdd, ssd = value.match(/(\d+)GB HDD \+ (\d+)GB SSD/)
+        phone.hdd = hdd.to_i
+        phone.ssd = ssd.to_i
+      when 'Modem 3G'
+        phone.umts = (value == 'Tak')
       when 'Pamięć RAM'
-        ct, unit = value.split
+        _, ct, unit = value.match(/(\d+)([MG]B)/).to_a
         ct = ct.to_i
         ct *= 1024 if unit == 'GB'
         phone.ram = ct
-      when 'Pojemność akumulatora'
-        phone.battery_mAh = value.to_i
-      when 'Czas czuwania'
-        v = value.to_fl
-        v /= 24 if v > 60
-        phone.battery_standby_days = v
-      when 'Czas rozmowy'
-        v = value.to_fl
-        v /= 60 if v > 150
-        phone.battery_talk_hours = v
+      when 'Karta graficzna'
+        phone.gpu = value
+      when 'Napęd optyczny'
+        phone.odd = {
+          'BLU-RAY' => :bdd,
+          'Brak' => false,
+          'DVD-RW' => :dvd
+        }[value]
+      when 'Seria'
       else
         warn "Unknown tag #{tag}, collecting values..." unless collecting?
         collect_tag tag, value
@@ -174,7 +153,7 @@ module Skapiec
   module Fetcher
     class << self
       include Methadone::CLILogging
-      URL = 'http://www.skapiec.pl/cat/200-telefony-gsm.html'
+      URL = 'http://www.skapiec.pl/cat/17-notebooki.html'
       
       def fetch
         require 'watir-webdriver'
