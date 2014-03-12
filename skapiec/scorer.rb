@@ -3,6 +3,17 @@ module Scorer
     lambda { |x| (x - m) / s rescue nil }
   end
 
+  WEIGHTS = {
+    ssd: 2,
+    matte: 0.2,
+    weight: 1,
+    bluetooth: 0.1,
+    odd: 0.1,
+    os: 1,
+    hdmi: 0,
+    touchscreen: 0.1
+  }
+
   class << self
     def score phone
       scores = self.methods.map do |t|
@@ -18,13 +29,15 @@ module Scorer
         warn "Left over keys: #{leftover_keys}"
         @warned = true
       end
+      WEIGHTS.each do |k, v|
+        scores[k] *= v rescue nil
+      end
       phone.scores = scores
       scores.values.compact.inject 0, :+
     end
 
     define_method :screen_size, Scorer.normal(15.12, 1.41)
     define_method :ppi, Scorer.normal(118, 25)
-    define_method :hdd, Scorer.normal(600, 271)
     define_method :ram, Scorer.normal(6816, 4644)
     def screen_resolution sr
       normal(1401292, 677179.2256205147)[sr.inject(:*)]
@@ -63,13 +76,24 @@ module Scorer
     end
 
     def gpu g
-      0 # fuck knows how to score it
+      case g
+      when /Intel/
+        1
+      else
+        2
+      end
+
     end
 
     def weight w
       -(normal(2.30, 0.55)[w])
     rescue
       nil
+    end
+
+    def hdd o
+      return -5 unless o
+      normal(600, 271)[o]
     end
 
     def ssd o
@@ -85,28 +109,28 @@ module Scorer
       kind, ver = os
       case kind
       when false
-        5
+        0
       when :linux
-        4
+        0
       when :darwin
-        3
-      when :chrome
-        2
-      when :android
-        1
+        5
       when :windows
         case ver
         when /8/
-          -1
+          5
         when /7/
-          -2
+          5
         when /Vista/
-          -3
+          5
         when /XP/
-          -5
+          -2
         else
           warn "unknown windows: #{os}" unless @warned
         end
+      when :chrome
+        -5
+      when :android
+        -5
       else
         warn "unknown os: #{os}" unless @warned
         nil

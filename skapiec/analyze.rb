@@ -9,9 +9,10 @@ require './scorer'
 
 Phone.scorer = Scorer
 
-phones = Skapiec.phones
+phones = Skapiec.phones.select { |p| p.price <= 1800 }
+puts "Total: #{phones.length} notebooks"
 
-def normalize phones, floor: 0, ceil: 100
+def normalize phones, floor: 0, ceil: 1000
   scores = phones.map(&:score)
   min, max = scores.minmax
   delta = max - min
@@ -21,7 +22,7 @@ def normalize phones, floor: 0, ceil: 100
   end
 end
 
-#normalize phones
+normalize phones
 scores = phones.map(&:score)
 
 def draw_hist bins, freqs
@@ -41,5 +42,5 @@ Skapiec.dump_collected_values
 #pp phones.map(&:os).uniq
 
 phones = phones.sort_by &:bfb #{|p|p.scores[:ram]||-1}
-pp phones[-1]
+pp phones[-3..-1]
 
